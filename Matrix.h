@@ -9,9 +9,13 @@
 
 class Matrix {
 public:
-    explicit Matrix(const std::vector<std::vector<int>> &matrix);
+    Matrix (const int xSize, const int ySize)noexcept;
 private:
+    const int xSize;
+    const int ySize;
     std::vector<std::vector<int>> matrix;
+    void initMatrix();
+    double random()noexcept ;
 };
 
 
