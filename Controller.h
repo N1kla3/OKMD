@@ -12,6 +12,7 @@ public:
     Controller()noexcept ;
 private:
     Matrix matrixProduct(const Matrix &one, const Matrix &two);
+    TripleMatrix getTripleMatrixProduct(const Matrix &one, const Matrix &two);
 };
 
 

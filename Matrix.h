@@ -5,7 +5,7 @@
 #ifndef OKMD_MATRIX_H
 #define OKMD_MATRIX_H
 
-#include <vector>
+#include "TripleMatrix.h"
 
 class Matrix {
 public:
