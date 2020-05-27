@@ -33,7 +33,7 @@ void Matrix::setAt(const int x, const int y, double value) {
     matrix[x][y] = value;
 }
 
-double Matrix::getAt(const int x, const int y) {
+double Matrix::getAt(const int x, const int y)const {
     if (x < 0 || x >= xSize)return 0;
     if (y < 0 || y >= ySize)return 0;
     return matrix[x][y];

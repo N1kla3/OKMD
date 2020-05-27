@@ -12,8 +12,10 @@ public:
     TripleMatrix(const int i, const int j, const int k);
     double getAt(const int i, const int j, const int k);
     void setAt(const int i, const int j, const int k, double value);
+    void getSize(int &i, int &j, int &k);
 private:
     std::vector<std::vector<std::vector<double>>> matrix;
+    int i, j, k;
 };
 
 

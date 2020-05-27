@@ -13,6 +13,7 @@ public:
 private:
     Matrix matrixProduct(const Matrix &one, const Matrix &two);
     TripleMatrix getTripleMatrixProduct(const Matrix &one, const Matrix &two);
+    void oneTripleMatrixLayProduct(const Matrix &one, const Matrix &two, TripleMatrix result, const int index);
 };
 
 

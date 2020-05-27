@@ -11,12 +11,12 @@ class Matrix {
 public:
     Matrix (const int xSize, const int ySize)noexcept;
     void setAt(const int x, const int y, double value);
-    double getAt(const int x, const int y);
+    double getAt(const int x, const int y)const;
+    const int ySize;
+    const int xSize;
 private:
     const double MIN_BOUND = -0.99;
     const double MAX_BOUND = 0.99;
-    const int xSize;
-    const int ySize;
     std::vector<std::vector<int>> matrix;
     void initMatrix();
     double random()noexcept ;
