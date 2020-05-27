@@ -9,9 +9,9 @@
 
 class TripleMatrix {
 public:
-    TripleMatrix(const int i, const int j, const int k);
-    double getAt(const int i, const int j, const int k);
-    void setAt(const int i, const int j, const int k, double value);
+    TripleMatrix(int i, int j, int k);
+    double getAt(int i, int j, int k);
+    void setAt(int i, int j, int k, double value);
     void getSize(int &i, int &j, int &k);
 private:
     std::vector<std::vector<std::vector<double>>> matrix;

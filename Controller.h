@@ -9,11 +9,18 @@
 
 class Controller {
 public:
-    Controller()noexcept ;
+    Controller();
+
+    virtual ~Controller();
+
 private:
+    int p, m, q;
+    Matrix *a, *b, *e, *g;
+    TripleMatrix *f, *d;
     Matrix matrixProduct(const Matrix &one, const Matrix &two);
-    TripleMatrix getTripleMatrixProduct(const Matrix &one, const Matrix &two);
-    void oneTripleMatrixLayProduct(const Matrix &one, const Matrix &two, TripleMatrix result, const int index);
+    void getTripleMatrixProduct(const Matrix &one, const Matrix &two);
+    void calcD(int index);
+    void calcF(int index);
 };
 
 

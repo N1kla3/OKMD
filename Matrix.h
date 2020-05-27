@@ -9,9 +9,9 @@
 
 class Matrix {
 public:
-    Matrix (const int xSize, const int ySize)noexcept;
-    void setAt(const int x, const int y, double value);
-    double getAt(const int x, const int y)const;
+    Matrix (int xSize, int ySize);
+    void setAt(int x, int y, double value);
+    double getAt(int x, int y)const;
     const int ySize;
     const int xSize;
 private:
@@ -19,7 +19,7 @@ private:
     const double MAX_BOUND = 0.99;
     std::vector<std::vector<int>> matrix;
     void initMatrix();
-    double random()noexcept ;
+    double random() const noexcept ;
 };
 
 

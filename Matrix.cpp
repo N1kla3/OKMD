@@ -5,14 +5,14 @@
 #include "Matrix.h"
 #include <random>
 
-Matrix::Matrix(const int xSize, const int ySize) noexcept :
+Matrix::Matrix(const int xSize, const int ySize)  :
     xSize(xSize),
     ySize(ySize)
     {
     initMatrix();
 }
 
-double Matrix::random() noexcept {
+double Matrix::random() const noexcept {
     std::uniform_real_distribution<double> unif(MIN_BOUND, MAX_BOUND);
     std::default_random_engine  engine;
     double random = unif(engine);
