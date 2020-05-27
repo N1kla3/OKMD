@@ -15,9 +15,9 @@ public:
     const int ySize;
     const int xSize;
 private:
-    const double MIN_BOUND = -0.99;
-    const double MAX_BOUND = 0.99;
-    std::vector<std::vector<int>> matrix;
+    const double MIN_BOUND = -1.0;
+    const double MAX_BOUND = 1.0;
+    std::vector<std::vector<double>> matrix;
     void initMatrix();
     double random() const noexcept ;
 };

@@ -5,49 +5,32 @@
 #include "Controller.h"
 #include <thread>
 #include <random>
+#include <iostream>
 
 using namespace std;
 
-Controller::Controller(){
-    std::uniform_int_distribution<int> unif(1, 10);
-    std::default_random_engine  engine;
-    p = unif(engine);
-    m = unif(engine);
-    q = unif(engine);
+//omg i j k = p q m
+
+Controller::Controller(int p, int q, int m) :
+        p(p),
+        q(q),
+        m(m){
     a = new Matrix(p, m);
     b = new Matrix(m, q);
     e = new Matrix(1, m);
     g = new Matrix(p, q);
-    strangeD = new Matrix(p, m);
-    strangeF = new Matrix(p, m);
-    maxStrange = new Matrix(p, m);
-    f = new TripleMatrix(p, m, q);
-    d = new TripleMatrix(p, m, q);
+    strangeD = new Matrix(p, q);
+    strangeF = new Matrix(p, q);
+    maxStrange = new Matrix(p, q);
+    f = new TripleMatrix(p, q, m);
+    d = new TripleMatrix(p, q, m);
 }
 
-Controller::~Controller() {
-    delete a;
-    delete b;
-    delete e;
-    delete g;
-    delete f;
-    delete d;
-    delete strangeF;
-    delete strangeD;
-    delete maxStrange;
-}
-
-Matrix Controller::matrixProduct(const Matrix &one, const Matrix &two) {
-    return Matrix(0, 0);
-}
-
-void Controller::getTripleMatrixProduct(const Matrix &one, const Matrix &two) {
+void Controller::getTripleMatrixProduct() {
     vector<thread> threads;
     for(int i = 0; i < p; ++i){
         threads.emplace_back(&Controller::calcD, this,i);
     }
-
-
     vector<thread> threads2;
     for(int i = 0; i < p; ++i){
         threads.emplace_back(&Controller::calcF, this, i);
@@ -61,7 +44,7 @@ void Controller::calcD(const int index) {
     d->getSize(maxi, maxj, maxk);
     for(int j = 0; j < maxj; ++j){
         for(int k = 0; k < maxk; ++k){
-            d->setAt(index, j, k, a->getAt(index, k)*b->getAt(k, j));
+            d->setAt(index, j, k, a->getAt(index, k) * b->getAt(k, j));
         }
     }
 }
@@ -81,11 +64,11 @@ void Controller::calcF(const int index) {
 
 double Controller::supAB(int i, int j, int k) {
     double result = 0;
-    double ajk = 1 - a->getAt(j, k);
+    double aik = 1 - a->getAt(i, k);
     double bkj = b->getAt(k, j);
-    if(ajk > bkj){
-        result = bkj / ajk;
-    }else if(ajk <= bkj){
+    if(aik > bkj){
+        result = bkj / aik;
+    }else if(aik <= bkj){
         result = 1;
     }
     return result;
@@ -93,42 +76,37 @@ double Controller::supAB(int i, int j, int k) {
 
 double Controller::supBA(int i, int j, int k) {
     double result = 0;
-    double ajk = a->getAt(j, k);
+    double aik = a->getAt(i, k);
     double bkj = 1 - b->getAt(k, j);
-    if(ajk < bkj){
-        result = ajk / bkj;
-    }else if(ajk <= bkj){
+    if(aik < bkj){
+        result = aik / bkj;
+    }else if(aik <= bkj){
         result = 1;
     }
     return result;
-}
-
-Matrix Controller::calcC() {
-    Matrix result(p, m);
-
 }
 
 void Controller::calcStrange() {
     vector<thread> threads;
     for(int i = 0; i < p; ++i){
         threads.emplace_back([this, i](){
-            for(int j = 0; j < m; ++j){
-                double res = 0;
-                for(int k = 0; k < q; ++k){
-                    res += f->getAt(i, j, k);
+            for(int j = 0; j < q; ++j){
+                double res = 1;
+                for(int k = 0; k < m; ++k){
+                    res *= f->getAt(i, j, k);
                 }
-                strangeF->setAt(p, m, res);
+                strangeF->setAt(i, j, res);
             }
         });
     }
     for(int i = 0; i < p; ++i){
         threads.emplace_back([this, i](){
-            for(int j = 0; j < m; ++j){
+            for(int j = 0; j < q; ++j){
                 double res = 1;
-                for(int k = 0; k < q; ++k){
-                    res -= (1 - d->getAt(i, j, k));
+                for(int k = 0; k < m; ++k){
+                    res *= (1 - d->getAt(i, j, k));
                 }
-                strangeD->setAt(i, j, res);
+                strangeD->setAt(i, j, 1-res);
             }
         });
     }
@@ -138,6 +116,50 @@ void Controller::calcStrange() {
 }
 
 void Controller::calcMaxStrange() {
+    for(int i = 0; i < p; ++i){
+        for(int j = 0; j < m; ++j){
+            maxStrange->setAt(i, j, max(0.0, strangeD->getAt(i, j)+strangeF->getAt(i, j)-1));
+        }
+    }
+}
 
+Matrix Controller::run() {
+    Matrix res(p, q);
+    getTripleMatrixProduct();
+    calcStrange();
+    calcMaxStrange();
+    for(int i = 0; i < p; ++i){
+        for(int j = 0; j < m; ++j){
+            double result = 0;
+            result += strangeF->getAt(i, j)*(3*g->getAt(i, j)-2)*g->getAt(i,j);
+            result += (strangeD->getAt(i, j) + (4*(maxStrange->getAt(i, j))-3*strangeD->getAt(i, j))*g->getAt(i, j))
+                    * (1-g->getAt(i, j));
+            res.setAt(i, j, result);
+        }
+    }
+    output();
+    cout << "\n Matrix C\n";
+    printMatrix(res);
+    return res;
+}
+
+void Controller::printMatrix(const Matrix &matrix) {
+    for(int i = 0; i < matrix.ySize; ++i){
+        for(int j = 0; j < matrix.xSize; ++j){
+            printf("%5.3f\t", matrix.getAt(i, j));
+        }
+        std::cout << "\n";
+    }
+}
+
+void Controller::output() {
+    cout << "\n Matrix A\n";
+    printMatrix(*a);
+    cout << "\n Matrix B\n";
+    printMatrix(*b);
+    cout << "\n Matrix E\n";
+    printMatrix(*e);
+    cout << "\n Matrix G\n";
+    printMatrix(*g);
 }
 

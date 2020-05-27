@@ -5,7 +5,9 @@
 #include "Matrix.h"
 #include <random>
 
-Matrix::Matrix(const int xSize, const int ySize)  :
+using namespace std;
+
+Matrix::Matrix(const int ySize, const int xSize)  :
     xSize(xSize),
     ySize(ySize)
     {
@@ -14,12 +16,13 @@ Matrix::Matrix(const int xSize, const int ySize)  :
 
 double Matrix::random() const noexcept {
     std::uniform_real_distribution<double> unif(MIN_BOUND, MAX_BOUND);
-    std::default_random_engine  engine;
+    std::default_random_engine  engine(random_device{}());
     double random = unif(engine);
     return random;
 }
 
 void Matrix::initMatrix() {
+    matrix = vector<vector<double>>(ySize, vector<double>(xSize, 0));
     for(int i = 0; i < ySize; ++i){
         for(int j = 0; j < xSize; ++j){
             matrix[i][j] = random();
@@ -28,13 +31,9 @@ void Matrix::initMatrix() {
 }
 
 void Matrix::setAt(const int x, const int y, double value) {
-    if (x < 0 || x >= xSize)return;
-    if (y < 0 || y >= ySize)return;
     matrix[x][y] = value;
 }
 
 double Matrix::getAt(const int x, const int y)const {
-    if (x < 0 || x >= xSize)return 0;
-    if (y < 0 || y >= ySize)return 0;
     return matrix[x][y];
 }
