@@ -24,16 +24,19 @@ Controller::Controller(int p, int q, int m) :
     maxStrange = new Matrix(p, q);
     f = new TripleMatrix(p, q, m);
     d = new TripleMatrix(p, q, m);
+    tacts = 0;
 }
 
 void Controller::getTripleMatrixProduct() {
     vector<thread> threads;
     for(int i = 0; i < p; ++i){
         threads.emplace_back(&Controller::calcD, this,i);
+        tacts += m*q;
     }
     vector<thread> threads2;
     for(int i = 0; i < p; ++i){
         threads.emplace_back(&Controller::calcF, this, i);
+        tacts += m*q*10;
     }
     for(auto &t : threads)t.join();
     for(auto &t : threads2)t.join();
@@ -98,6 +101,7 @@ void Controller::calcStrange() {
                 strangeF->setAt(i, j, res);
             }
         });
+        tacts += q*m;
     }
     for(int i = 0; i < p; ++i){
         threads.emplace_back([this, i](){
@@ -109,6 +113,7 @@ void Controller::calcStrange() {
                 strangeD->setAt(i, j, 1-res);
             }
         });
+        tacts += q*m;
     }
     for(auto &i : threads){
         i.join();
@@ -119,6 +124,7 @@ void Controller::calcMaxStrange() {
     for(int i = 0; i < p; ++i){
         for(int j = 0; j < m; ++j){
             maxStrange->setAt(i, j, max(0.0, strangeD->getAt(i, j)+strangeF->getAt(i, j)-1));
+            tacts++;
         }
     }
 }
@@ -135,11 +141,13 @@ Matrix Controller::run() {
             result += (strangeD->getAt(i, j) + (4*(maxStrange->getAt(i, j))-3*strangeD->getAt(i, j))*g->getAt(i, j))
                     * (1-g->getAt(i, j));
             res.setAt(i, j, result);
+            tacts += 11;
         }
     }
     output();
     cout << "\n Matrix C\n";
     printMatrix(res);
+    cout << "\n Tacts :" << tacts << "\n";
     return res;
 }
 

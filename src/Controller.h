@@ -9,6 +9,7 @@
 
 class Controller {
 public:
+    int tacts;
     Controller(int p, int q, int m);
     Matrix run();
     int p, m, q;
