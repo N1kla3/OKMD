@@ -11,7 +11,6 @@ class Controller {
 public:
     Controller(int p, int q, int m);
     Matrix run();
-private:
     int p, m, q;
     Matrix *a, *b, *e, *g, *strangeF, *strangeD, *maxStrange;
     TripleMatrix *f, *d;

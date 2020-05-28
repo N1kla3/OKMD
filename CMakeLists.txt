@@ -3,4 +3,5 @@ project(OKMD)
 
 set(CMAKE_CXX_STANDARD 17)
 SET(CMAKE_CXX_FLAGS -pthread)
-add_executable(OKMD main.cpp Matrix.cpp Matrix.h Controller.cpp Controller.h TripleMatrix.cpp TripleMatrix.h)
+add_executable(OKMD main.cpp src/Matrix.cpp src/Matrix.h src/Controller.cpp src/Controller.h src/TripleMatrix.cpp src/TripleMatrix.h)
+add_subdirectory(test)

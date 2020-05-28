@@ -1,5 +1,5 @@
 
-#include "Controller.h"
+#include "src/Controller.h"
 
 int main() {
     auto *o = new Controller(2, 3, 4);
