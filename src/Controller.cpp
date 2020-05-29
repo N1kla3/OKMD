@@ -31,13 +31,12 @@ void Controller::getTripleMatrixProduct() {
     vector<thread> threads;
     for(int i = 0; i < p; ++i){
         threads.emplace_back(&Controller::calcD, this,i);
-        tacts += m*q;
     }
     vector<thread> threads2;
     for(int i = 0; i < p; ++i){
         threads.emplace_back(&Controller::calcF, this, i);
-        tacts += m*q*10;
     }
+    tacts += m*q*10;
     for(auto &t : threads)t.join();
     for(auto &t : threads2)t.join();
 }
@@ -101,8 +100,8 @@ void Controller::calcStrange() {
                 strangeF->setAt(i, j, res);
             }
         });
-        tacts += q*m;
     }
+    tacts += q*m;
     for(int i = 0; i < p; ++i){
         threads.emplace_back([this, i](){
             for(int j = 0; j < q; ++j){
@@ -113,7 +112,6 @@ void Controller::calcStrange() {
                 strangeD->setAt(i, j, 1-res);
             }
         });
-        tacts += q*m;
     }
     for(auto &i : threads){
         i.join();
