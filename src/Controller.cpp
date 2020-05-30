@@ -11,10 +11,11 @@ using namespace std;
 
 //omg i j k = p q m
 
-Controller::Controller(int p, int q, int m) :
+Controller::Controller(int p, int q, int m, int count) :
         p(p),
         q(q),
-        m(m){
+        m(m),
+        threadCount(count){
     a = new Matrix(p, m);
     b = new Matrix(m, q);
     e = new Matrix(1, m);
@@ -29,16 +30,27 @@ Controller::Controller(int p, int q, int m) :
 
 void Controller::getTripleMatrixProduct() {
     vector<thread> threads;
-    for(int i = 0; i < p; ++i){
-        threads.emplace_back(&Controller::calcD, this,i);
+    int i = 0, j = 0;
+    bool mat = true;
+    while (i < p || j < p) {
+        bool whatTact = false;
+        for (int k = 0; k < threadCount; ++k) {
+            if(mat && i < p){
+                threads.emplace_back(&Controller::calcD, this, i);
+                i++;
+            }else if(!mat && j < p){
+                threads.emplace_back(&Controller::calcF, this, j);
+                j++;
+                whatTact = true;
+            }
+            mat = !mat;
+        }
+        if(whatTact)
+            tacts += m * q * 10;
+        else tacts += m* q;
+        for (auto &t : threads)t.join();
+        threads.clear();
     }
-    vector<thread> threads2;
-    for(int i = 0; i < p; ++i){
-        threads.emplace_back(&Controller::calcF, this, i);
-    }
-    tacts += m*q*10;
-    for(auto &t : threads)t.join();
-    for(auto &t : threads2)t.join();
 }
 
 void Controller::calcD(const int index) {
@@ -71,7 +83,7 @@ double Controller::supAB(int i, int j, int k) {
     if(aik > bkj){
         result = bkj / aik;
     }else if(aik <= bkj){
-        result = 1;
+        result = 1.0;
     }
     return result;
 }
@@ -83,38 +95,45 @@ double Controller::supBA(int i, int j, int k) {
     if(aik < bkj){
         result = aik / bkj;
     }else if(aik <= bkj){
-        result = 1;
+        result = 1.0;
     }
     return result;
 }
 
 void Controller::calcStrange() {
     vector<thread> threads;
-    for(int i = 0; i < p; ++i){
-        threads.emplace_back([this, i](){
-            for(int j = 0; j < q; ++j){
-                double res = 1;
-                for(int k = 0; k < m; ++k){
-                    res *= f->getAt(i, j, k);
-                }
-                strangeF->setAt(i, j, res);
+    int i = 0, j = 0;
+    bool mat = true;
+    while (i < p || j < p) {
+        for (int k = 0; k < threadCount; ++k) {
+            if(mat && i < p){
+                threads.emplace_back([this, i](){
+                    for(int j = 0; j < q; ++j){
+                        double res = 1;
+                        for(int k = 0; k < m; ++k){
+                            res *= f->getAt(i, j, k);
+                        }
+                        strangeF->setAt(i, j, res);
+                    }
+                });
+                i++;
+            }else if(!mat && j < p){
+                threads.emplace_back([this, j](){
+                    for(int z = 0; z < q; ++z){
+                        double res = 1;
+                        for(int k = 0; k < m; ++k){
+                            res *= (1 - d->getAt(j, z, k));
+                        }
+                        strangeD->setAt(j, z, 1 - res);
+                    }
+                });
+                j++;
             }
-        });
-    }
-    tacts += q*m;
-    for(int i = 0; i < p; ++i){
-        threads.emplace_back([this, i](){
-            for(int j = 0; j < q; ++j){
-                double res = 1;
-                for(int k = 0; k < m; ++k){
-                    res *= (1 - d->getAt(i, j, k));
-                }
-                strangeD->setAt(i, j, 1-res);
-            }
-        });
-    }
-    for(auto &i : threads){
-        i.join();
+            mat = !mat;
+        }
+        tacts += q*m;
+        for (auto &t : threads)t.join();
+        threads.clear();
     }
 }
 
@@ -159,6 +178,7 @@ void Controller::printMatrix(const Matrix &matrix) {
 }
 
 void Controller::output() {
+    cout << "p :" << p << ", q :" << q << ", m :" << m << ", Threads :" << threadCount <<"\n";
     cout << "\n Matrix A\n";
     printMatrix(*a);
     cout << "\n Matrix B\n";
