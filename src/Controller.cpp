@@ -15,7 +15,8 @@ Controller::Controller(int p, int q, int m, int count) :
         p(p),
         q(q),
         m(m),
-        threadCount(count){
+        threadCount(count),
+        lavg(0.0){
     a = new Matrix(p, m);
     b = new Matrix(m, q);
     e = new Matrix(1, m);
@@ -45,9 +46,14 @@ void Controller::getTripleMatrixProduct() {
             }
             mat = !mat;
         }
-        if(whatTact)
+        if(whatTact){
             tacts += m * q * 10;
-        else tacts += m* q;
+            lavg += m*q*10;
+        }
+        else {
+            tacts += m* q;
+            lavg += m*q;
+        }
         for (auto &t : threads)t.join();
         threads.clear();
     }
@@ -132,6 +138,7 @@ void Controller::calcStrange() {
             mat = !mat;
         }
         tacts += q*m;
+        lavg += q*m;
         for (auto &t : threads)t.join();
         threads.clear();
     }
@@ -165,6 +172,7 @@ Matrix Controller::run() {
     cout << "\n Matrix C\n";
     printMatrix(res);
     cout << "\n Tacts :" << tacts << "\n";
+    cout << "\n Lavg :" << lavg << "\n";
     return res;
 }
 

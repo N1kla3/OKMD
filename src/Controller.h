@@ -10,6 +10,7 @@
 class Controller {
 public:
     int tacts;
+    double lavg;
     int threadCount;
     Controller(int p, int q, int m, int count);
     Matrix run();
