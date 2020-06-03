@@ -23,7 +23,7 @@ Controller::Controller(int p, int q, int m, int count) :
     g = new Matrix(p, q);
     strangeD = new Matrix(p, q);
     strangeF = new Matrix(p, q);
-    maxStrange = new Matrix(p, q);
+    minStrange = new Matrix(p, q);
     f = new TripleMatrix(p, q, m);
     d = new TripleMatrix(p, q, m);
     tacts = 0;
@@ -144,10 +144,10 @@ void Controller::calcStrange() {
     }
 }
 
-void Controller::calcMaxStrange() {
+void Controller::calcMinStrange() {
     for(int i = 0; i < p; ++i){
         for(int j = 0; j < m; ++j){
-            maxStrange->setAt(i, j, max(0.0, strangeD->getAt(i, j)+strangeF->getAt(i, j)-1));
+            minStrange->setAt(i, j, min(strangeD->getAt(i, j), strangeF->getAt(i, j)));
             tacts++;
         }
     }
@@ -157,12 +157,12 @@ Matrix Controller::run() {
     Matrix res(p, q);
     getTripleMatrixProduct();
     calcStrange();
-    calcMaxStrange();
+    calcMinStrange();
     for(int i = 0; i < p; ++i){
         for(int j = 0; j < m; ++j){
             double result = 0;
             result += strangeF->getAt(i, j)*(3*g->getAt(i, j)-2)*g->getAt(i,j);
-            result += (strangeD->getAt(i, j) + (4*(maxStrange->getAt(i, j))-3*strangeD->getAt(i, j))*g->getAt(i, j))
+            result += (strangeD->getAt(i, j) + (4*(minStrange->getAt(i, j)) - 3 * strangeD->getAt(i, j)) * g->getAt(i, j))
                     * (1-g->getAt(i, j));
             res.setAt(i, j, result);
             tacts += 11;

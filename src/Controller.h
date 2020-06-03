@@ -15,7 +15,7 @@ public:
     Controller(int p, int q, int m, int count);
     Matrix run();
     int p, m, q;
-    Matrix *a, *b, *e, *g, *strangeF, *strangeD, *maxStrange;
+    Matrix *a, *b, *e, *g, *strangeF, *strangeD, *minStrange;
     TripleMatrix *f, *d;
     void getTripleMatrixProduct();
     void calcD(int index);
@@ -23,7 +23,7 @@ public:
     double supAB(int i, int j, int k);
     double supBA(int i, int j, int k);
     void calcStrange();
-    void calcMaxStrange();
+    void calcMinStrange();
     void printMatrix(const Matrix &matrix);
     void output();
 };
