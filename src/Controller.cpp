@@ -64,7 +64,7 @@ void Controller::calcD(const int index) {
     d->getSize(maxi, maxj, maxk);
     for(int j = 0; j < maxj; ++j){
         for(int k = 0; k < maxk; ++k){
-            d->setAt(index, j, k, a->getAt(index, k) * b->getAt(k, j));
+            d->setAt(index, j, k, min(a->getAt(index, k), b->getAt(k, j)));
         }
     }
 }
@@ -83,27 +83,15 @@ void Controller::calcF(const int index) {
 }
 
 double Controller::supAB(int i, int j, int k) {
-    double result = 0;
     double aik = 1 - a->getAt(i, k);
     double bkj = b->getAt(k, j);
-    if(aik > bkj){
-        result = bkj / aik;
-    }else if(aik <= bkj){
-        result = 1.0;
-    }
-    return result;
+    return max(aik, bkj);
 }
 
 double Controller::supBA(int i, int j, int k) {
-    double result = 0;
     double aik = a->getAt(i, k);
     double bkj = 1 - b->getAt(k, j);
-    if(aik < bkj){
-        result = aik / bkj;
-    }else if(aik <= bkj){
-        result = 1.0;
-    }
-    return result;
+    return max(aik, bkj);
 }
 
 void Controller::calcStrange() {
@@ -147,7 +135,7 @@ void Controller::calcStrange() {
 void Controller::calcMinStrange() {
     for(int i = 0; i < p; ++i){
         for(int j = 0; j < m; ++j){
-            minStrange->setAt(i, j, min(strangeD->getAt(i, j), strangeF->getAt(i, j)));
+            minStrange->setAt(i, j, strangeD->getAt(i, j) * strangeF->getAt(i, j));
             tacts++;
         }
     }
